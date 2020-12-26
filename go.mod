@@ -1,4 +1,4 @@
-module github.com/roman-mazur/chat-channels-example
+module github.com/gogaeva/architecture-lab-3
 
 go 1.15
 

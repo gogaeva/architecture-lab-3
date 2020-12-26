@@ -6,21 +6,24 @@
 package main
 
 import (
-	"github.com/roman-mazur/chat-channels-example/server/channels"
+	"github.com/gogaeva/architecture-lab-3/server/forums"
 )
 
 // Injectors from modules.go:
 
-func ComposeApiServer(port HttpPortNumber) (*ChatApiServer, error) {
+// ComposeApiServer will create an instance of CharApiServer according to providers defined in this file.
+func ComposeApiServer(port HttpPortNumber) (*ForumApiServer, error) {
 	db, err := NewDbConnection()
 	if err != nil {
 		return nil, err
 	}
-	store := channels.NewStore(db)
-	httpHandlerFunc := channels.HttpHandler(store)
-	chatApiServer := &ChatApiServer{
-		Port:            port,
-		ChannelsHandler: httpHandlerFunc,
+	dbInterface := forums.NewDBInterface(db)
+	httpListForumsHandlerFunc := forums.HttpListForumsHandler(dbInterface)
+	httpAddUserHandlerFunc := forums.HttpAddUserHandler(dbInterface)
+	forumApiServer := &ForumApiServer{
+		Port:              port,
+		ListForumsHandler: httpListForumsHandlerFunc,
+		AddUserHandler:    httpAddUserHandlerFunc,
 	}
-	return chatApiServer, nil
+	return forumApiServer, nil
 }

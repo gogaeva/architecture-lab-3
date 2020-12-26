@@ -3,17 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/roman-mazur/chat-channels-example/server/channels"
 	"net/http"
+
+	"github.com/gogaeva/architecture-lab-3/server/forums"
 )
 
 type HttpPortNumber int
 
 // ChatApiServer configures necessary handlers and starts listening on a configured port.
-type ChatApiServer struct {
+type ForumApiServer struct {
 	Port HttpPortNumber
 
-	ChannelsHandler channels.HttpHandlerFunc
+	ListForumsHandler forums.HttpListForumsHandlerFunc
+	AddUserHandler    forums.HttpAddUserHandlerFunc
 
 	server *http.Server
 }
@@ -21,16 +23,20 @@ type ChatApiServer struct {
 // Start will set all handlers and start listening.
 // If this methods succeeds, it does not return until server is shut down.
 // Returned error will never be nil.
-func (s *ChatApiServer) Start() error {
-	if s.ChannelsHandler == nil {
-		return fmt.Errorf("channels HTTP handler is not defined - cannot start")
+func (s *ForumApiServer) Start() error {
+	if s.ListForumsHandler == nil {
+		return fmt.Errorf("HTTP ListVmsHandler is not defined - cannot start")
+	}
+	if s.AddUserHandler == nil {
+		return fmt.Errorf("HTTP DiscConnectionHandler is not defined - cannot start")
 	}
 	if s.Port == 0 {
 		return fmt.Errorf("port is not defined")
 	}
 
 	handler := new(http.ServeMux)
-	handler.HandleFunc("/channels", s.ChannelsHandler)
+	handler.HandleFunc("/forums", s.ListForumsHandler)
+	handler.HandleFunc("/add_user", s.AddUserHandler)
 
 	s.server = &http.Server{
 		Addr:    fmt.Sprintf(":%d", s.Port),
@@ -41,7 +47,7 @@ func (s *ChatApiServer) Start() error {
 }
 
 // Stops will shut down previously started HTTP server.
-func (s *ChatApiServer) Stop() error {
+func (s *ForumApiServer) Stop() error {
 	if s.server == nil {
 		return fmt.Errorf("server was not started")
 	}

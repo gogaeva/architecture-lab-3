@@ -3,19 +3,19 @@
 package main
 
 import (
+	"github.com/gogaeva/architecture-lab-3/server/forums"
 	"github.com/google/wire"
-	"github.com/roman-mazur/chat-channels-example/server/channels"
 )
 
 // ComposeApiServer will create an instance of CharApiServer according to providers defined in this file.
-func ComposeApiServer(port HttpPortNumber) (*ChatApiServer, error) {
+func ComposeApiServer(port HttpPortNumber) (*ForumApiServer, error) {
 	wire.Build(
 		// DB connection provider (defined in main.go).
 		NewDbConnection,
 		// Add providers from channels package.
-		channels.Providers,
+		forums.Providers,
 		// Provide ChatApiServer instantiating the structure and injecting channels handler and port number.
-		wire.Struct(new(ChatApiServer), "Port", "ChannelsHandler"),
+		wire.Struct(new(ForumApiServer), "Port", "ListForumsHandler", "AddUserHandler"),
 	)
 	return nil, nil
 }
